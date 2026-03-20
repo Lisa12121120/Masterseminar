@@ -1,0 +1,167 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2024
+
+
+% ready for submission
+\usepackage[preprint,nonatbib]{neurips_2024}
+
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+%     \usepackage[final]{neurips_2024}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+\usepackage{todonotes}
+
+\usepackage[backend=biber,style=numeric]{biblatex}
+
+\addbibresource{Masterseminar.bib}
+
+\title{Evaluating the Decision-Making Capabilities of LLM-based Agents for Production Scheduling}
+
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to break the
+% lines. Using \AND forces a line break at that point. So, if LaTeX puts 3 of 4
+% authors names on the first line and the last on the second line, try using
+% \AND instead of \And before the third author name.
+
+
+\author{%
+  Name Surename \\
+  Informatik, Matr NR \\
+  \texttt{emailaddress@tha.de} \\
+}
+
+
+\begin{document}
+
+
+\maketitle
+
+\section{Introduction and Motivation}
+
+Industrial production systems are becoming increasingly complex due to fluctuating demand, variable processing times and limited machine availability. Efficient production scheduling is therefore a central challenge in modern manufacturing environments. In particular, flexible job shop scheduling problems require selecting machines and processing sequences for multiple jobs while satisfying resource constraints.
+
+Traditional scheduling approaches often rely on predefined heuristics or rule-based strategies \todo{Quelle}. While these methods perform well in static environments, they struggle to adapt to dynamic conditions such as machine failures, unexpected job arrivals, or changes in processing times.
+
+Recent advances in artificial intelligence have introduced new approaches for complex decision-making problems. Reinforcement learning (RL) has shown promising results for dynamic scheduling tasks, but RL-based solutions usually require extensive training and often need retraining when the production environment changes.
+
+Large language models (LLMs) have recently demonstrated strong capabilities in reasoning, planning and tool interaction when used as agent-based systems. These models can process structured input, generate decisions and interact with external systems. LLM-based agents could therefore serve as flexible decision-making components for production control systems.
+
+This work focuses on the systematic evaluation of LLM-based agents for production scheduling in flexible job shop environments, with the goal of assessing their ability to generate valid and efficient scheduling decisions under different system configurations.
+
+
+
+\section{State of the Art}
+
+Production scheduling has been extensively studied in operations research and industrial engineering. Classical approaches include rule-based heuristics and optimization methods designed to minimize metrics such as makespan, waiting times, or machine idle times.
+
+More recently, reinforcement learning has been explored for learning scheduling policies through interaction with production environments. Zhang et al.~\cite{zhangDeepReinforcementLearning2023} investigate deep reinforcement learning for dynamic flexible job shop scheduling with variable processing times.
+
+In parallel, recent research explores the use of large language models as agents capable of reasoning and interacting with external systems. Xia et al.~\cite{xiaControlIndustrialAutomation2025b} propose a framework in which an LLM agent interacts with industrial automation systems via a tool-based architecture. Similarly, Vyas et al.~\cite{vyasAutonomousIndustrialControl2024a} present an agentic framework for autonomous industrial control using LLMs.
+
+Despite these advances, the application of LLM-based agents to production scheduling remains largely unexplored. In particular, there is limited empirical evidence regarding the effectiveness and robustness of LLM-generated scheduling decisions.
+
+
+\section{Problem Definition and Research Questions}
+
+Based on the current state of research, several open questions remain regarding the role of large language models in production scheduling tasks.
+
+This work therefore focuses on evaluating the decision-making capabilities of LLM-based agents in flexible job shop environments. The following research questions guide the investigation:
+
+
+\begin{itemize}
+
+\item How can LLM-based agents be integrated into production scheduling systems?
+
+\item To what extent can LLM-based agents generate valid and effective scheduling decisions in flexible job shop environments?
+
+\item Which types of scheduling decisions (e.g., job selection, machine assignment and sequencing) can be reliably performed by LLM-based agents?
+
+\item How does the representation of the production state (e.g., JSON format, tabular representation, or textual description) influence the quality of the generated scheduling decisions?
+
+\item How does increasing production system complexity affect the decision quality of LLM-based scheduling agents?
+
+\item (Optional) How does the performance of LLM-based scheduling approaches compare to classical heuristic scheduling methods?
+
+\end{itemize}
+
+\section{Planned Methodology}
+
+The goal of this work is to analyze the performance of large language models as decision-making agents in production scheduling tasks. The study combines a literature review with an experimental evaluation using a simulated production environment.
+
+A flexible job shop simulation environment will model a simplified industrial production system with multiple machines, different job types and dynamic task arrivals. Within this environment, an LLM-based scheduling agent observes the current system state and generates scheduling decisions such as selecting the next job and assigning it to an available machine.
+
+The LLM acts as a high-level decision-making component that receives structured information about the production state and outputs scheduling actions. The experiments will analyze how factors such as prompt design, input representation and production process dependencies influence decision quality.
+
+(Optional) The performance of the LLM-based scheduler will be compared with classical heuristic scheduling strategies such as First Come First Serve (FCFS), Shortest Processing Time (SPT) and Earliest Due Date (EDD).
+
+In addition, the experiments will investigate different types of scheduling decisions, including job selection, machine assignment and integrated scheduling. The representation of the production state will also be varied, for example using structured formats such as JSON, tabular representations, or natural language descriptions.
+
+
+\subsection{Data}
+
+The experiments will use simulated production data generated by a flexible job shop scheduling environment. This environment represents industrial scenarios with multiple machines, different job types and varying processing times.
+
+Synthetic datasets will be generated to simulate dynamic production conditions, including varying job arrival rates, machine availability constraints, variable processing times and resource bottlenecks.
+
+The simulation environment provides the current system state to the scheduling agent, including information about machines, queued jobs, processing times and machine workloads. This production state will be provided to the LLM in different representations, such as JSON structures, tabular formats, or natural language descriptions.
+
+
+\subsection{Planned Modelling / Experiment / Analysis}
+
+The experimental setup consists of a simulated flexible job shop environment in which scheduling decisions must be made dynamically.
+
+Production scheduling involves several types of decisions, including selecting the next job to process, assigning jobs to machines and determining processing order. The experiments will therefore evaluate different scheduling tasks such as job selection, machine assignment and integrated scheduling decisions.
+
+Different representations of the production state will also be compared, including structured JSON formats, tabular representations of jobs and machines and natural language descriptions.
+
+Experiments will be conducted across multiple production scenarios with increasing complexity, varying job arrival patterns, machine availability and dependencies between production tasks.
+
+The analysis focuses on evaluating the performance and robustness of LLM-based scheduling decisions under these different conditions.
+
+\subsection{Planned Evaluation}
+
+The evaluation will rely on commonly used performance metrics from the production scheduling literature. These metrics enable a quantitative comparison between the LLM-based scheduling agent and baseline methods.
+
+Possible evaluation metrics include:
+
+\begin{itemize}
+\item makespan (total completion time)
+\item average job flow time
+\item machine utilization
+\item job waiting time
+\item number of delayed jobs
+\end{itemize}
+
+In addition to quantitative metrics, the experiments will analyze the consistency and validity of LLM-generated scheduling decisions. This includes verifying whether generated actions satisfy system constraints and whether similar system states lead to consistent decisions.
+
+A qualitative analysis of selected decision cases will also be conducted to better understand the reasoning behavior of LLM-based agents in complex scheduling situations.
+
+
+\section{(Optional) Work Plan and Timetable}
+
+\begin{itemize}
+\item Weeks 1--2: Literature research on production scheduling and LLM-based agents
+\item Weeks 3--4: Implementation and refinement of the LLM-based scheduling prototype
+\item Weeks 5--6: Experimental evaluation and comparison with heuristic baselines
+\item Weeks 7--8: Writing and revision of the seminar paper
+\end{itemize}
+
+\printbibliography
+
+
+\end{document}
