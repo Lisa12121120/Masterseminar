@@ -54,166 +54,122 @@
 
 \section{Introduction and Motivation}
 
-Industrial production systems are characterized by high complexity due to fluctuating workloads, variable processing times and limited machine availability. Efficient production planning is therefore a key challenge in manufacturing environments. In particular, flexible job-shop scheduling requires assigning jobs to machines while respecting resource constraints.
+Industrial production systems are characterized by high complexity due to fluctuating workloads and limited resource availability. A central challenge is the \textbf{Flexible Job-Shop Scheduling Problem (FJSS)}, an NP-hard optimization task that involves two coupled decision levels: \textbf{machine assignment} (routing operations to capable resources) and \textbf{operation sequencing} (ordering tasks on each machine) to minimize the overall completion time, known as \textbf{makespan ($C_{max}$)}.
 
-Traditional approaches rely on predefined heuristics or rule-based strategies (e.g., SPT or EDD)~\cite[Chapter 3]{leungHandbookSchedulingAlgorithms2004}. While effective in stable environments, they lack adaptability to dynamic changes such as machine failures or new job arrivals.
+Traditional approaches rely on predefined heuristics or rule-based strategies (e.g., SPT or EDD)~\cite[Chapter 3]{leungHandbookSchedulingAlgorithms2004}. While robust, these methods often lack the flexibility required for complex, multi-objective environments.
 
 Advances in artificial intelligence have introduced new approaches for solving complex decision-making problems. Reinforcement learning (RL) has shown promising results for dynamic scheduling~\cite{WASCHNECK20181264, waschneckDeepReinforcementLearning2018, zhangDeepReinforcementLearning2023}, but typically requires extensive training and retraining when system conditions change.
 
-Large language models (LLMs) have recently demonstrated strong capabilities in reasoning, planning and tool interaction~\cite{yaoREACSYNERGIZINGREASONING2022, schickToolformerLanguageModels2023}. When used as agents, they can process structured inputs and generate decisions, making them a potential alternative for flexible production control~\cite{vyasAutonomousIndustrialControl2024a, xiaControlIndustrialAutomation2025a}.
+Recent advances in Large Language Models (LLMs) have shown significant potential in reasoning and planning. Unlike Reinforcement Learning (RL), which requires extensive training for specific environments, LLM-based agents offer the possibility of \textbf{zero-shot generalization}.
 
-This work evaluates LLM-based agents for production scheduling in flexible job-shop environments, focusing on their ability to generate valid and efficient decisions under varying system conditions.
-
+This work evaluates whether the inherent reasoning capabilities of LLMs can be leveraged to solve FJSS instances without any domain-specific fine-tuning or training. The focus lies on understanding the gap between LLM-generated schedules and mathematical optima.
 
 
 \section{State of the Art}
 
-Classical scheduling approaches include rule-based heuristics and optimization methods aimed at minimizing metrics such as makespan or waiting time~\cite[Chapter 3]{leungHandbookSchedulingAlgorithms2004}.
+Classical scheduling approaches include rule-based heuristics and exact optimization methods aimed at minimizing metrics such as makespan or waiting time~\cite[Chapter 3]{leungHandbookSchedulingAlgorithms2004}. While exact methods guarantee optimality, their computational complexity often limits them to smaller instances.
 
-More recently, reinforcement learning has been successfully applied to dynamic scheduling problems, demonstrating the ability to learn adaptive strategies in complex environments~\cite{zhangDeepReinforcementLearning2023, WASCHNECK20181264}.
-
-
-At the same time, current research explores the use of large language models as agents that are capable of reasoning and interacting with external systems. Foundational work shows that large language models can combine reasoning and action capabilities and integrate external tools into decision-making processes. Yao et al.~\cite{yaoREACSYNERGIZINGREASONING2022}, for example, demonstrate that language models can structure and solve complex tasks by combining reasoning and acting. Schick et al.~\cite{schickToolformerLanguageModels2023} further show that language models can learn to use external tools autonomously in order to extend their capabilities.
-
-Initial work applies LLM agents to industrial control systems~\cite{xiaControlIndustrialAutomation2025a, vyasAutonomousIndustrialControl2024a}, highlighting their potential as flexible decision-making components.
-
-However, their application to production scheduling remains largely unexplored, particularly with respect to systematic evaluation of performance, robustness and decision quality.
+Current research explores LLMs as agents capable of "Reasoning and Acting" (ReAct)~\cite{yaoREACSYNERGIZINGREASONING2022}. While initial applications in industrial control exist~\cite{xiaControlIndustrialAutomation2025a, vyasAutonomousIndustrialControl2024a}, the application to FJSS remains largely unexplored. This research distinguishes itself from closely related works (e.g., ~\cite{abgaryanLLMsCanSchedule2024}) by focusing strictly on the \textbf{zero-shot performance} of frontier models and providing a rigorous comparison against \textbf{exact solvers (CP-SAT)} to quantify the optimality gap.
 
 
 \section{Problem Definition and Research Questions}
 
-This work evaluates the decision-making capabilities of LLM-based agents in flexible job-shop environments. The following research questions guide the investigation:
+The goal of this research is to evaluate the ability of LLM-based agents to handle the combinatorial complexity of FJSS (assignment and sequencing) under zero-shot conditions. The primary objective is the minimization of the makespan $C_{max}$ while respecting all precedence and resource constraints.
+
+The research focuses on two central questions:
 
 \begin{itemize}
-
-\item \textbf{Performance and Real-Time Suitability}
-\begin{itemize}
-    \item To what extent can LLM-based agents generate valid and effective scheduling decisions?
-    \item How suitable are LLM-based agents for real-time scheduling in terms of response time and latency?
+    \item \textbf{RQ1:} To what extent can LLM-based agents generate valid and efficient scheduling decisions in flexible job-shop scenarios (FJSS) without domain-specific training or fine-tuning compared to established heuristics and exact solvers?
+    \item \textbf{RQ2:} How do prompt engineering (e.g., Chain-of-Thought) and input representation influence the agent's ability to maintain constraints and reduce the optimality gap?
 \end{itemize}
 
-\item \textbf{Types of Scheduling Decisions}
-\begin{itemize}
-    \item Which types of scheduling decisions (e.g., job selection, machine assignment, sequencing) can be reliably performed?
-\end{itemize}
-
-\item \textbf{Factors Influencing Decision Quality}
-\begin{itemize}
-    \item How does input representation (JSON, text) affect decision quality?
-    \item How does system dynamics (static vs. dynamic environments) affect performance?
-\end{itemize}
-
-\item \textbf{Prompt Design}
-\begin{itemize}
-    \item How does prompt design influence decision quality and consistency? (prompt design: basic vs. chain-of-thought prompting)
-\end{itemize}
-
-\item \textbf{Comparison with Classical Methods (optional)}
-\begin{itemize}
-    \item (Optional) How does the performance of LLM-based scheduling approaches compare to classical heuristic methods?
-\end{itemize}
-
-\end{itemize}
+Supporting aspects such as real-time suitability and comparison with classical heuristics (e.g., EDD) are analyzed as secondary considerations.
 
 
 
 \section{Planned Methodology}
 
-This work combines a literature review with an experimental evaluation in a simulated production environment.
+This work combines a literature review with a experimental evaluation in a simulated production environment. To ensure feasibility and scientific rigor, the study utilizes established benchmarks (e.g., \textbf{Taillard's instances}) and leverages the \texttt{job-shop-lib} for environment simulation.
 
-A simplified flexible job-shop simulation is developed to model a production system consisting of a fixed number of machines and jobs with sequential operations. The simulation abstracts conveyor systems and focuses on machine allocation and job sequencing decisions. Some operations can be processed on multiple alternative machines, while others require a specific machine. Multiple jobs can be present in the system simultaneously.
+A simplified flexible job-shop simulation is developed to model a production system consisting of a fixed number of machines and jobs with sequential operations. The simulation focuses on machine allocation and job sequencing decisions. Some operations can be processed on multiple alternative machines, while others require a specific machine. Multiple jobs can be present in the system simultaneously.
 
-The LLM-based agent observes the current system state and generates scheduling actions. The output of the LLM is structured as a machine-readable set of job-machine assignments. The generated decisions are validated and executed within the simulation environment.
 
-Two different system scenarios are considered:
-
-\begin{itemize}
-    \item \textbf{Static scenario:} A fixed set of jobs is processed without changes during execution.
-    \item \textbf{Dynamic scenario:} New jobs arrive during execution and machines may become temporarily unavailable due to failures or become available again after repairs.
-\end{itemize}
-
-The experiments focus on three key factors influencing LLM performance:
-
-\begin{itemize}
-    \item \textbf{Input representation:} JSON vs. natural language descriptions
-    \item \textbf{Prompt design:} basic instructions vs. chain-of-thought prompting
-    \item \textbf{System dynamics:} static vs. dynamic environment
-\end{itemize}
-
-To ensure comparability, the performance of the LLM-based scheduler is evaluated against a classical heuristic baseline, specifically the Earliest Due Date (EDD) rule.
+\subsection{Benchmarking Strategy}
+The performance of the LLM-based agent is evaluated using a three-tier comparison:
+\begin{enumerate}
+    \item \textbf{Lower Bound (Random Dispatcher):} Serves as a baseline to validate the complexity of the chosen problem instances.
+    \item \textbf{Heuristic Baseline (EDD):} Represents the standard industrial heuristic against which the LLM must compete.
+    \item \textbf{Optimal Reference (CP-SAT):} Using \textbf{Google OR-Tools}, the global optimum is calculated for small to medium-sized instances to determine the absolute performance quality of the LLM.
+\end{enumerate}
 
 Multiple runs per configuration are conducted to analyze stability and reproducibility.
 
-\subsection{Data}
 
-Synthetic job data is generated to simulate realistic production scenarios. Each job consists of a sequence of operations that must be processed in a predefined order and has an associated due date.
+\subsection{Experimental Design}
 
-Processing times depend on the job type. In the dynamic scenario, additional variability is introduced through random job arrivals and machine failures.
+The LLM-based agent receives a structured representation of the machine environment (both in natural language and JSON) and the jobs to be processed (including their operations, processing times, and due dates). Based on this input, the LLM generates a series of decisions interpreted as job-machine assignments. These decisions are validated and executed within the simulation environment.
 
-The system state includes information about:
+If time permits, a dynamic scenario with random job arrivals and machine failures will be furthermore explored. Key variables include:
 
 \begin{itemize}
-    \item available machines and their status (idle, busy, unavailable, and expected finish times) 
-    \item jobs waiting for processing
-    \item remaining operations per job
-    \item due dates
+    \item \textbf{Input representation:} Structured JSON format vs. natural language.
+    \item \textbf{Prompt design:} Basic zero-shot instructions vs. Chain-of-Thought (CoT).
 \end{itemize}
 
 
+
+\subsection{Data}
+
+The simulation is implemented using \texttt{job-shop-lib}, with optima calculated via \texttt{OR-Tools} (\texttt{cp\_model}) and benchmarking using Taillard instances. Synthetic job data is generated to simulate realistic production scenarios. Each job consists of a sequence of operations that must be processed in a predefined order and has an associated due date.
+
+Processing times depend on the job type and the assigned machine. In the optional dynamic scenario, additional variability is introduced through random job arrivals and machine failures.
+
+The system state provided to the LLM includes:
+\begin{itemize}
+    \item Available machines and their status (idle, busy, unavailable, and expected finish times) 
+    \item Jobs waiting for processing
+    \item Remaining operations per job
+    \item Due dates
+\end{itemize}
 
 This state is provided to the LLM in different representations, namely structured JSON format and natural language descriptions.
 
 \subsection{Planned Model / Experiment / Analysis}
 
-The experimental setup consists of a simulation environment in which scheduling decisions must be made sequentially.
+The experiments follow a factorial design focusing on the \textbf{static FJSS} to isolate the reasoning capabilities of the models. The agent's task is to observe the system state and output a machine-readable set of job-machine assignments.
 
-At each decision step, the LLM receives the current system state and generates a set of scheduling actions, each consisting of selecting a job and assigning it to a machine. Each generated action is validated individually. Valid and conflict-free actions are executed, while invalid or conflicting actions are discarded and recorded for evaluation. To reduce complexity, the model abstracts transport processes by assigning fixed transfer times between machines instead of explicitly modeling routing decisions. Multiple jobs can be processed in parallel, depending on machine availability.
+Valid and conflict-free actions are executed, while invalid or conflicting actions are discarded and recorded for evaluation. To reduce complexity, the model abstracts transport processes by assigning fixed transfer times between machines instead of explicitly modeling routing decisions. Multiple jobs can be processed in parallel, depending on machine availability.
 
 
 The experiments follow a factorial design with the following factors:
 
 \begin{itemize}
-    \item Scenario: static vs. dynamic
-    \item Input representation: JSON vs. text
-    \item Prompt design: basic vs. chain-of-thought
+    \item Scenario: Static vs. Dynamic (optional)
+    \item Input representation: JSON vs. Text
+    \item Prompt design: Basic vs. Chain-of-Thought
 \end{itemize}
 
-This results in a total of 8 experimental configurations. Each configuration is repeated multiple times to ensure robustness of the results.
-
-The analysis focuses on comparing the performance of the LLM across different configurations and against the heuristic baseline. In addition to quantitative metrics, qualitative analysis is conducted to identify typical error patterns and limitations of the LLM-based approach.
+Each experimental configuration is repeated multiple times to ensure robustness of the results. The analysis compares the LLM performance across configurations and against the heuristic baseline, including a qualitative analysis of typical error patterns.
 
 \subsection{Planned Evaluation}
+The evaluation is based on standard performance metrics from production scheduling and LLM-specific metrics:
 
-The evaluation is based on standard performance metrics from production scheduling literature.
-
-\textbf{Efficiency metrics:}
+\textbf{Efficiency and Scheduling Metrics:}
 \begin{itemize}
-    \item makespan (total completion time)
-    \item average flow time
+    \item \textbf{Optimality Gap:} The relative difference between the LLM's $C_{max}$ and the CP-SAT optimum.
+    \item \textbf{Heuristic Improvement:} Performance gain/loss relative to the EDD baseline.
+    \item \textbf{Makespan ($C_{max}$):} Total completion time.
+    \item \textbf{Tardy Jobs:} Number of jobs exceeding their due date.
 \end{itemize}
 
-\textbf{Due date related metrics:}
+\textbf{LLM-specific and Robustness Metrics:}
 \begin{itemize}
-    \item number of tardy jobs
+    \item \textbf{Feasibility Rate:} Rate of invalid decisions (e.g., precedence violations).
+    \item \textbf{Technical Robustness:} Rate of invalid output formats or invalid/conflicting assignments.
+    \item \textbf{Latency:} Response time per decision.
 \end{itemize}
 
-\textbf{Resource utilization:}
-\begin{itemize}
-    \item machine utilization
-\end{itemize}
-
-\textbf{LLM-specific metrics:}
-\begin{itemize}
-    \item invalid decision rate (violations of system constraints)
-    \item response time (latency per decision)
-    \item rate of outputs with invalid format
-    \item rate of invalid assignments (e.g., non-existing machines or jobs)
-    \item rate of conflicting assignments (e.g., multiple jobs assigned to the same machine)
-\end{itemize}
-
-In addition to quantitative evaluation, the robustness and consistency of the LLM are analyzed by examining repeated runs under identical conditions.
-
-Furthermore, a comparison with the EDD heuristic provides a baseline for assessing the effectiveness of the LLM-based approach.
+In addition to quantitative evaluation, the robustness and consistency of the LLM are analyzed by examining repeated runs under identical conditions. Furthermore, a comparison with the EDD  and CP-SAT heuristic provides a baseline for assessing the effectiveness of the LLM-based approach.
 
 \printbibliography
 
