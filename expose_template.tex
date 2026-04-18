@@ -54,13 +54,13 @@
 
 \section{Introduction and Motivation}
 
-Industrial production systems are characterized by high complexity due to fluctuating workloads and limited resource availability. A central challenge is the \textbf{Flexible Job-Shop Scheduling Problem (FJSS)}, an NP-hard optimization task that involves two coupled decision levels: \textbf{machine assignment} (routing operations to capable resources) and \textbf{operation sequencing} (ordering tasks on each machine) to minimize the overall completion time, known as \textbf{makespan ($C_{max}$)}.
+Industrial production systems are characterized by high complexity due to fluctuating workloads and limited resource availability. A central challenge is the Flexible Job-Shop Scheduling Problem (FJSS), an NP-hard optimization task that involves two coupled decision levels: machine assignment (routing operations to capable resources) and operation sequencing (ordering tasks on each machine) to minimize the overall completion time, known as makespan ($C_{max}$).
 
 Traditional approaches rely on predefined heuristics or rule-based strategies (e.g., SPT or EDD)~\cite[Chapter 3]{leungHandbookSchedulingAlgorithms2004}. While robust, these methods often lack the flexibility required for complex, multi-objective environments.
 
 Advances in artificial intelligence have introduced new approaches for solving complex decision-making problems. Reinforcement learning (RL) has shown promising results for dynamic scheduling~\cite{WASCHNECK20181264, waschneckDeepReinforcementLearning2018, zhangDeepReinforcementLearning2023}, but typically requires extensive training and retraining when system conditions change.
 
-Recent advances in Large Language Models (LLMs) have shown significant potential in reasoning and planning. Unlike Reinforcement Learning (RL), which requires extensive training for specific environments, LLM-based agents offer the possibility of \textbf{zero-shot generalization}.
+Recent advances in Large Language Models (LLMs) have shown significant potential in reasoning and planning. Unlike Reinforcement Learning (RL), which requires extensive training for specific environments, LLM-based agents offer the possibility of zero-shot generalization.
 
 This work evaluates whether the inherent reasoning capabilities of LLMs can be leveraged to solve FJSS instances without any domain-specific fine-tuning or training. The focus lies on understanding the gap between LLM-generated schedules and mathematical optima.
 
@@ -69,7 +69,7 @@ This work evaluates whether the inherent reasoning capabilities of LLMs can be l
 
 Classical scheduling approaches include rule-based heuristics and exact optimization methods aimed at minimizing metrics such as makespan or waiting time~\cite[Chapter 3]{leungHandbookSchedulingAlgorithms2004}. While exact methods guarantee optimality, their computational complexity often limits them to smaller instances.
 
-Current research explores LLMs as agents capable of "Reasoning and Acting" (ReAct)~\cite{yaoREACSYNERGIZINGREASONING2022}. While initial applications in industrial control exist~\cite{xiaControlIndustrialAutomation2025a, vyasAutonomousIndustrialControl2024a}, the application to FJSS remains largely unexplored. This research distinguishes itself from closely related works (e.g., ~\cite{abgaryanLLMsCanSchedule2024}) by focusing strictly on the \textbf{zero-shot performance} of frontier models and providing a rigorous comparison against \textbf{exact solvers (CP-SAT)} to quantify the optimality gap.
+Current research explores LLMs as agents capable of "Reasoning and Acting" (ReAct)~\cite{yaoREACSYNERGIZINGREASONING2022}. While initial applications in industrial control exist~\cite{xiaControlIndustrialAutomation2025b, vyasAutonomousIndustrialControl2024a}, the application to FJSS remains largely unexplored. This research distinguishes itself from closely related works (e.g., ~\cite{abgaryanLLMsCanSchedule2024}) by focusing strictly on the zero-shot performance of frontier models and providing a rigorous comparison against exact solvers (CP-SAT) to quantify the optimality gap.
 
 
 \section{Problem Definition and Research Questions}
@@ -89,7 +89,7 @@ Supporting aspects such as real-time suitability and comparison with classical h
 
 \section{Planned Methodology}
 
-This work combines a literature review with a experimental evaluation in a simulated production environment. To ensure feasibility and scientific rigor, the study utilizes established benchmarks (e.g., \textbf{Taillard's instances}) and leverages the \texttt{job-shop-lib} for environment simulation.
+This work combines a literature review with a experimental evaluation in a simulated production environment. To ensure feasibility and scientific rigor, the study utilizes established benchmarks (e.g., Taillard's instances) and leverages the \texttt{job-shop-lib} for environment simulation.
 
 A simplified flexible job-shop simulation is developed to model a production system consisting of a fixed number of machines and jobs with sequential operations. The simulation focuses on machine allocation and job sequencing decisions. Some operations can be processed on multiple alternative machines, while others require a specific machine. Multiple jobs can be present in the system simultaneously.
 
@@ -99,7 +99,7 @@ The performance of the LLM-based agent is evaluated using a three-tier compariso
 \begin{enumerate}
     \item \textbf{Lower Bound (Random Dispatcher):} Serves as a baseline to validate the complexity of the chosen problem instances.
     \item \textbf{Heuristic Baseline (EDD):} Represents the standard industrial heuristic against which the LLM must compete.
-    \item \textbf{Optimal Reference (CP-SAT):} Using \textbf{Google OR-Tools}, the global optimum is calculated for small to medium-sized instances to determine the absolute performance quality of the LLM.
+    \item \textbf{Optimal Reference (CP-SAT):} Using Google OR-Tools, the global optimum is calculated for small to medium-sized instances to determine the absolute performance quality of the LLM.
 \end{enumerate}
 
 Multiple runs per configuration are conducted to analyze stability and reproducibility.
@@ -136,7 +136,7 @@ This state is provided to the LLM in different representations, namely structure
 
 \subsection{Planned Model / Experiment / Analysis}
 
-The experiments follow a factorial design focusing on the \textbf{static FJSS} to isolate the reasoning capabilities of the models. The agent's task is to observe the system state and output a machine-readable set of job-machine assignments.
+The experiments follow a factorial design focusing on the static FJSS to isolate the reasoning capabilities of the models. The agent's task is to observe the system state and output a machine-readable set of job-machine assignments.
 
 Valid and conflict-free actions are executed, while invalid or conflicting actions are discarded and recorded for evaluation. To reduce complexity, the model abstracts transport processes by assigning fixed transfer times between machines instead of explicitly modeling routing decisions. Multiple jobs can be processed in parallel, depending on machine availability.
 
