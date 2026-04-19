@@ -41,9 +41,9 @@
 
 
 \author{%
-  Name Surename \\
-  Informatik, Matr NR \\
-  \texttt{emailaddress@tha.de} \\
+  Hadler Lisa \\
+  Informatik, 2248167 \\
+  \texttt{lisa.hadler1@tha.de} \\
 }
 
 
@@ -54,102 +54,186 @@
 
 \section{Introduction and Motivation}
 
-Industrial production systems are characterized by high complexity due to fluctuating workloads and limited resource availability. A central challenge is the Flexible Job-Shop Scheduling Problem (FJSS), an NP-hard optimization task that involves two coupled decision levels: machine assignment (routing operations to capable resources) and operation sequencing (ordering tasks on each machine) to minimize the overall completion time, known as makespan ($C_{max}$).
+Industrial production systems are characterized by high complexity due to fluctuating workloads and limited resource availability. A central challenge is the Flexible Job-Shop Scheduling Problem (FJSS), an NP-hard optimization task that involves two coupled decision levels: machine assignment (routing operations to capable resources) and operation sequencing (ordering tasks on each machine) to minimize the overall completion time, known as makespan ($C_{max}$). In the flexible variant, each operation may be processed on one of several eligible machines, each with a different processing time, making the assignment and sequencing decisions tightly coupled.
 
 Traditional approaches rely on predefined heuristics or rule-based strategies (e.g., SPT or EDD)~\cite[Chapter 3]{leungHandbookSchedulingAlgorithms2004}. While robust, these methods often lack the flexibility required for complex, multi-objective environments.
 
 Advances in artificial intelligence have introduced new approaches for solving complex decision-making problems. Reinforcement learning (RL) has shown promising results for dynamic scheduling~\cite{WASCHNECK20181264, waschneckDeepReinforcementLearning2018, zhangDeepReinforcementLearning2023}, but typically requires extensive training and retraining when system conditions change.
 
-Recent advances in Large Language Models (LLMs) have shown significant potential in reasoning and planning. Unlike Reinforcement Learning (RL), which requires extensive training for specific environments, LLM-based agents offer the possibility of zero-shot generalization.
+Large Language Models (LLMs) offer a fundamentally different paradigm: rather
+than learning a policy through thousands of training interactions, they can
+reason over a textual description of the scheduling state and generate
+decisions without any task-specific training or fine-tuning. This
+zero-shot generalization capability distinguishes LLM-based approaches from
+both classical heuristics and RL methods, and is the central property
+evaluated in this work.
 
-This work evaluates whether the inherent reasoning capabilities of LLMs can be leveraged to solve FJSS instances without any domain-specific fine-tuning or training. The focus lies on understanding the gap between LLM-generated schedules and mathematical optima.
+This work therefore asks: can the general reasoning capabilities of LLMs,
+applied zero-shot, produce scheduling decisions of sufficient quality to
+compete with established heuristics, and how large is the gap to mathematical
+optima?
 
 
 \section{State of the Art}
 
 Classical scheduling approaches include rule-based heuristics and exact optimization methods aimed at minimizing metrics such as makespan or waiting time~\cite[Chapter 3]{leungHandbookSchedulingAlgorithms2004}. While exact methods guarantee optimality, their computational complexity often limits them to smaller instances.
 
-Current research explores LLMs as agents capable of "Reasoning and Acting" (ReAct)~\cite{yaoREACSYNERGIZINGREASONING2022}. While initial applications in industrial control exist~\cite{xiaControlIndustrialAutomation2025b, vyasAutonomousIndustrialControl2024a}, the application to FJSS remains largely unexplored. This research distinguishes itself from closely related works (e.g., ~\cite{abgaryanLLMsCanSchedule2024}) by focusing strictly on the zero-shot performance of frontier models and providing a rigorous comparison against exact solvers (CP-SAT) to quantify the optimality gap.
+Recent work applies LLMs as agents capable of Reasoning and Acting (ReAct)~\cite{yaoREACSYNERGIZINGREASONING2022}, and initial applications in industrial control systems have been demonstrated~\cite{xiaControlIndustrialAutomation2025,vyasAutonomousIndustrialControl2024}.
+
+
+The most closely related work is Abgaryan et al.~\cite{abgaryanLLMsCanSchedule2024}, who show that LLMs can solve Job-Shop Scheduling Problems with performance comparable to other neural approaches. However, their approach relies on supervised fine-tuning of LLMs on a purpose-built dataset of 120k scheduling instances. This work differs fundamentally: no training data is used, no model is fine-tuned, and no domain-specific supervision is provided. Instead, frontier LLMs are evaluated purely in a zero-shot setting, directly testing their general reasoning capabilities on FJSS. This distinction is the core contribution and the key open question in the literature.
 
 
 \section{Problem Definition and Research Questions}
 
-The goal of this research is to evaluate the ability of LLM-based agents to handle the combinatorial complexity of FJSS (assignment and sequencing) under zero-shot conditions. The primary objective is the minimization of the makespan $C_{max}$ while respecting all precedence and resource constraints.
-
-The research focuses on two central questions:
-
+The goal of this research is to evaluate the zero-shot decision-making ability
+of LLM-based agents on the FJSS. The primary objective is minimization of the
+makespan~$C_{max}$ while respecting all precedence and resource constraints.
+The research is focused on one central question with one supporting aspect:
+ 
 \begin{itemize}
-    \item \textbf{RQ1:} To what extent can LLM-based agents generate valid and efficient scheduling decisions in flexible job-shop scenarios (FJSS) without domain-specific training or fine-tuning compared to established heuristics and exact solvers?
-    \item \textbf{RQ2:} How do prompt engineering (e.g., Chain-of-Thought) and input representation influence the agent's ability to maintain constraints and reduce the optimality gap?
+  \item \textbf{RQ1 (Core):} To what extent can frontier LLMs generate valid
+    and efficient scheduling decisions for the FJSS in a zero-shot setting,
+    without any task-specific training or fine-tuning, compared to a random
+    dispatcher, an EDD heuristic, and a CP-SAT optimal solver?
+  \item \textbf{RQ2 (Supporting):} How do prompt design (zero-shot
+    vs.\ Chain-of-Thought) and input representation (JSON vs.\ natural
+    language) influence the quality and feasibility of LLM scheduling
+    decisions?
 \end{itemize}
-
-Supporting aspects such as real-time suitability and comparison with classical heuristics (e.g., EDD) are analyzed as secondary considerations.
-
-
+ 
+RQ1 addresses the fundamental capability question and provides the main
+contribution. RQ2 provides practical guidance on how to best elicit scheduling
+decisions from LLMs and is addressed through a focused factorial experiment.
 
 \section{Planned Methodology}
 
-This work combines a literature review with a experimental evaluation in a simulated production environment. To ensure feasibility and scientific rigor, the study utilizes established benchmarks (e.g., Taillard's instances) and leverages the \texttt{job-shop-lib} for environment simulation.
+This work combines a literature review with an experimental evaluation in a simulated production environment. To ensure feasibility within the time frame
+of the Masterseminar, the implementation maximizes reuse of established
+libraries and minimizes custom development. The central design decision is to
+use job-shop-lib's Dispatcher~\cite{arinoPabloo22Job_shop_lib2026} as a unified
+interface between all solvers: every strategy -- LLM, EDD, Random, and CP-SAT
+-- receives the same dispatcher state and returns a scheduling decision. This
+makes the strategies interchangeable and limits new development to only the
+LLM-specific components.
 
-A simplified flexible job-shop simulation is developed to model a production system consisting of a fixed number of machines and jobs with sequential operations. The simulation focuses on machine allocation and job sequencing decisions. Some operations can be processed on multiple alternative machines, while others require a specific machine. Multiple jobs can be present in the system simultaneously.
+Concretely, the following components are reused directly from existing
+libraries without modification: the simulation environment and dispatching
+state management (job-shop-lib Dispatcher), benchmark
+instance loading (load\_benchmark\_instance() for Taillard
+instances~\cite{taillardBenchmarksBasicScheduling1993}), random instance generation
+(GeneralInstanceGenerator), the EDD and random dispatching rules
+(DispatchingRuleSolver) and the CP-SAT optimal solver
+(ORToolsSolver). LLM inference is conducted locally
+via Ollama or through a cloud-based API (e.g., OllamaApi), depending on
+model availability and computational resources.
+
+The components developed specifically for this work are limited to: (1)~the
+LLM agent bridge, which reads the Dispatcher state and
+serializes it into an LLM-readable prompt in either JSON or natural language
+format; and (2)~the evaluation pipeline with its associated metrics.
+
+A flexible job-shop simulation is built on top of job-shop-lib to
+model a production system with a fixed number of machines and jobs with
+sequential operations. Some operations can be processed on multiple alternative
+machines, while others require a specific machine. Multiple jobs can be present
+in the system simultaneously.
 
 
 \subsection{Benchmarking Strategy}
-The performance of the LLM-based agent is evaluated using a three-tier comparison:
+The performance of the LLM-based agent is evaluated using a three-tier
+comparison:
+ 
 \begin{enumerate}
-    \item \textbf{Lower Bound (Random Dispatcher):} Serves as a baseline to validate the complexity of the chosen problem instances.
-    \item \textbf{Heuristic Baseline (EDD):} Represents the standard industrial heuristic against which the LLM must compete.
-    \item \textbf{Optimal Reference (CP-SAT):} Using Google OR-Tools, the global optimum is calculated for small to medium-sized instances to determine the absolute performance quality of the LLM.
+  \item \textbf{Lower Bound (Random Dispatcher):} A random dispatching rule
+    provided by job-shop-lib serves as a baseline to validate the
+    complexity of the chosen problem instances.
+  \item \textbf{Heuristic Baseline (EDD):} The Earliest Due Date rule,
+    provided by job-shop-lib's DispatchingRuleSolver,
+    represents the standard industrial heuristic against which the LLM must
+    compete.
+  \item \textbf{Optimal Reference (CP-SAT):} The global optimum is computed
+    via the ORToolsSolver included in job-shop-lib for small
+    to medium-sized instances to determine the absolute performance quality of
+    the LLM.
 \end{enumerate}
-
-Multiple runs per configuration are conducted to analyze stability and reproducibility.
+ 
+Multiple runs per configuration are conducted to analyze stability and
+reproducibility.
 
 
 \subsection{Experimental Design}
 
-The LLM-based agent receives a structured representation of the machine environment (both in natural language and JSON) and the jobs to be processed (including their operations, processing times, and due dates). Based on this input, the LLM generates a series of decisions interpreted as job-machine assignments. These decisions are validated and executed within the simulation environment.
-
-If time permits, a dynamic scenario with random job arrivals and machine failures will be furthermore explored. Key variables include:
-
+The LLM-based agent receives a structured representation of the scheduling
+state via the Dispatcher interface at each decision step. This
+includes machine status (idle, busy, and expected finish times), all waiting
+jobs with remaining operations, processing times per eligible machine, and due
+dates. Based on this input, the LLM generates one job-machine assignment per
+step, which is validated and executed via Dispatcher.dispatch().
+Invalid actions are recorded for evaluation and replaced by an EDD fallback
+to ensure the simulation always terminates.
+ 
+The experiment follows a static FJSS design to isolate the zero-shot reasoning
+capabilities of the LLMs. A dynamic scenario (e.g., machine failures) is
+explicitly excluded from the scope of this work, as meaningful LLM reasoning
+in such settings would require failure-specific context (e.g., failure
+probabilities per machine) that goes beyond the standard FJSS formulation and
+cannot be addressed within the time frame of the Masterseminar.
+ 
+Key experimental variables are:
+ 
 \begin{itemize}
-    \item \textbf{Input representation:} Structured JSON format vs. natural language.
-    \item \textbf{Prompt design:} Basic zero-shot instructions vs. Chain-of-Thought (CoT).
+  \item \textbf{Input representation:} Structured JSON format vs.\ natural
+    language (addresses RQ2).
+  \item \textbf{Prompt design:} Basic zero-shot instructions
+    vs.\ Chain-of-Thought (CoT) (addresses RQ2).
 \end{itemize}
 
 
 
 \subsection{Data}
 
-The simulation is implemented using \texttt{job-shop-lib}, with optima calculated via \texttt{OR-Tools} (\texttt{cp\_model}) and benchmarking using Taillard instances. Synthetic job data is generated to simulate realistic production scenarios. Each job consists of a sequence of operations that must be processed in a predefined order and has an associated due date.
-
-Processing times depend on the job type and the assigned machine. In the optional dynamic scenario, additional variability is introduced through random job arrivals and machine failures.
-
-The system state provided to the LLM includes:
+Benchmark instances are loaded directly via job-shop-lib using
+load\_benchmark\_instance() (e.g., Taillard's
+instances~\cite{taillardBenchmarksBasicScheduling1993}) or generated randomly via
+GeneralInstanceGenerator. Due dates are not part of the original
+Taillard format and are therefore generated synthetically using a slack factor
+relative to each job's total processing time.
+ 
+The system state provided to the LLM at each decision step includes:
+ 
 \begin{itemize}
-    \item Available machines and their status (idle, busy, unavailable, and expected finish times) 
-    \item Jobs waiting for processing
-    \item Remaining operations per job
-    \item Due dates
+  \item Available machines and their status (idle, busy and
+    expected finish times)
+  \item Jobs waiting for processing
+  \item Remaining operations per job
+  \item Due dates
 \end{itemize}
-
-This state is provided to the LLM in different representations, namely structured JSON format and natural language descriptions.
+ 
+This state is provided to the LLM in different representations, namely
+structured JSON format and natural language descriptions.
 
 \subsection{Planned Model / Experiment / Analysis}
 
-The experiments follow a factorial design focusing on the static FJSS to isolate the reasoning capabilities of the models. The agent's task is to observe the system state and output a machine-readable set of job-machine assignments.
-
-Valid and conflict-free actions are executed, while invalid or conflicting actions are discarded and recorded for evaluation. To reduce complexity, the model abstracts transport processes by assigning fixed transfer times between machines instead of explicitly modeling routing decisions. Multiple jobs can be processed in parallel, depending on machine availability.
-
-
-The experiments follow a factorial design with the following factors:
-
+The experiments follow a factorial design focusing on the static FJSS to
+isolate the reasoning capabilities of the models. At each step, the
+Dispatcher exposes the set of ready operations; the active strategy
+selects one and calls dispatch() to advance the simulation. Invalid
+or conflicting actions are discarded, recorded for evaluation, and replaced by
+an EDD fallback to ensure the simulation always terminates.
+ 
+The factorial design covers the following factors:
+ 
 \begin{itemize}
-    \item Scenario: Static vs. Dynamic (optional)
-    \item Input representation: JSON vs. Text
-    \item Prompt design: Basic vs. Chain-of-Thought
+  \item Input representation: JSON vs.\ Text
+  \item Prompt design: Basic vs.\ Chain-of-Thought
 \end{itemize}
-
-Each experimental configuration is repeated multiple times to ensure robustness of the results. The analysis compares the LLM performance across configurations and against the heuristic baseline, including a qualitative analysis of typical error patterns.
+ 
+Each experimental configuration is repeated multiple times to ensure
+robustness of the results. The analysis compares the LLM performance across
+configurations and against the heuristic baseline, including a qualitative
+analysis of typical error patterns (e.g., machine eligibility violations,
+precedence errors).
 
 \subsection{Planned Evaluation}
 The evaluation is based on standard performance metrics from production scheduling and LLM-specific metrics:
@@ -169,7 +253,10 @@ The evaluation is based on standard performance metrics from production scheduli
     \item \textbf{Latency:} Response time per decision.
 \end{itemize}
 
-In addition to quantitative evaluation, the robustness and consistency of the LLM are analyzed by examining repeated runs under identical conditions. Furthermore, a comparison with the EDD  and CP-SAT heuristic provides a baseline for assessing the effectiveness of the LLM-based approach.
+In addition to quantitative evaluation, the robustness and consistency of the
+LLM are analyzed by examining repeated runs under identical conditions.
+A comparison with the random dispatcher, EDD, and CP-SAT reference provides
+a baseline for assessing the effectiveness of the LLM-based approach.
 
 \printbibliography
 
